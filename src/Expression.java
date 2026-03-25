@@ -36,3 +36,19 @@ class StringNode implements Expression {
         return value;
     }
 }
+
+// ─── VariableNode ───────────────────────────────────────────────────────────
+
+class VariableNode implements Expression {
+    private final String name;
+
+    public VariableNode(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public Object evaluate(Environment env) {
+        // Looks up the variable's current value in the Environment.
+        return env.get(name);
+    }
+}
