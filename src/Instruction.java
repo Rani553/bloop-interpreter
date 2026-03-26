@@ -32,6 +32,36 @@ class AssignInstruction implements Instruction {
 
 
 
+// ─── PrintInstruction ────────────────────────────────────────────────────────
+// Handles:  print <expr>
+// Example:  print result   or   print "Hello from BLOOP"
+
+class PrintInstruction implements Instruction {
+    private final Expression expression;
+
+    public PrintInstruction(Expression expression) {
+        this.expression = expression;
+    }
+
+    @Override
+    public void execute(Environment env) {
+        Object value = expression.evaluate(env);
+
+        // Print numbers without a trailing ".0" when the value is a whole number.
+        if (value instanceof Double) {
+            double d = (Double) value;
+            if (d == Math.floor(d) && !Double.isInfinite(d)) {
+                System.out.println((long) d);
+            } else {
+                System.out.println(d);
+            }
+        } else {
+            System.out.println(value);
+        }
+    }
+}
+
+
 // ─── IfInstruction ───────────────────────────────────────────────────────────
 // Handles:  if <condition> then:
 //               <body instructions>
