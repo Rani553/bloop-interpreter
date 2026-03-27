@@ -84,7 +84,7 @@ class BinaryOpNode implements Expression {
                 case "-": return l - r;
                 case "*": return l * r;
                 case "/":
-                    if (r == 0) throw new RuntimeException("Division by zero.");
+                    if (r == 0) throw new ArithmeticException("Division by zero.");
                     return l / r;
             }
         }
