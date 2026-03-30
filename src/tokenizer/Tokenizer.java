@@ -39,8 +39,6 @@ public class Tokenizer {
                 tokens.add(readWord());
                 continue;
             }
-
-            // Unknown character — skip for now (Day 3 handles rest)
             pos++;
         }
 
