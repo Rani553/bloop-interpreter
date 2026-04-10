@@ -33,9 +33,9 @@ public class Parser {
             case IF:     return parseIf();
             case REPEAT: return parseRepeat();
             default:
-                // Unknown token on a new line — skip the whole line
-                advancePastNewline();
-                return null;
+                throw new RuntimeException(
+                "Syntax Error: Unexpected token '" + token.getValue() +
+                "' at line " + token.getLine()); // FIXED: no silent skipping
         }
     }
 
@@ -45,7 +45,7 @@ public class Parser {
     //  put <expr> into <variable>
     private Instruction parseAssign() {
         consume(TokenType.PUT);
-        Expression expr = parseExpression();   // the value expression
+        Expression expr = parseComparison(); // FIXED: supports comparison 
         consume(TokenType.INTO);
         Token name = consume(TokenType.IDENTIFIER);
         consumeNewlineOrEOF();
@@ -58,7 +58,7 @@ public class Parser {
     //  print <expr>
     private Instruction parsePrint() {
         consume(TokenType.PRINT);
-        Expression expr = parseExpression();
+        Expression expr = parseComparison(); // FIXED: supports comparison
         consumeNewlineOrEOF();
         return new PrintInstruction(expr);
     }
@@ -132,16 +132,24 @@ public class Parser {
 
             if (isAtEnd()) break;
 
-            // If we skipped a blank line (>=2 newlines or the block just
-            // ended naturally with one newline then hits a top-level line),
-            // AND the next token is a block-starter keyword, we stop.
-            if (newlineCount >= 2 && isBlockStarter(peek().getType())) {
+            TokenType nextType = peek().getType();
+
+             // STOP CONDITION:
+            // If we hit a top-level statement after a blank line
+            if (newlineCount >= 1 && isBlockStarter(nextType)) {
                 break;
-            }
+            }   
+
 
             // Parse the next instruction as a body instruction.
             Instruction instr = parseInstruction();
+
             if (instr != null) body.add(instr);
+
+            else {
+            throw new RuntimeException(
+                "Invalid statement inside block at line " + peek().getLine());
+            }
         }
 
         return body;
